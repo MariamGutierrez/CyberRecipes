@@ -20,7 +20,7 @@ app.mount("/vendor", StaticFiles(directory="static/vendor"), name="vendor")
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
-    return templates.TemplateResponse("recetas/index.html", {"request": request})
+    return templates.TemplateResponse("recetas/browser.html", {"request": request})
 
 app.include_router(receta_routes.router)
 
