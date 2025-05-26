@@ -94,9 +94,7 @@ https://templatemo.com/tm-579-cyborg-gaming
                 <div class="heading-section">
                   <h4><em>Top</em> Downloaded</h4>
                 </div>
-                <ul id="receta-list">
-                  <!-- aquí irán las recetas -->
-                </ul>
+                <div class="row" id="receta-list"></div>
                 <div class="text-button">
                   <a href="profile.html">View All Games</a>
                 </div>
@@ -137,35 +135,40 @@ https://templatemo.com/tm-579-cyborg-gaming
   </body>
 <script>
 
-  const API_BASE = window.location.hostname.includes('localhost')
-    ? 'http://localhost:8000'
-    : 'https://recetas-791ea0b5224e.herokuapp.com';
+const API_BASE = window.location.hostname.includes('localhost')
+  ? 'http://localhost:8000'
+  : 'https://recetas-791ea0b5224e.herokuapp.com';
 
-  fetch(`${API_BASE}/recetas`)
-    .then(res => res.json())
-    .then(data => {
-      const listContainer = document.getElementById('receta-list');
-      listContainer.innerHTML = ''; // limpiamos si hay contenido
+fetch(`${API_BASE}/recetas`)
+  .then(res => res.json())
+  .then(data => {
+    const listContainer = document.getElementById('receta-list');
+    listContainer.innerHTML = '';
 
-      data.forEach(receta => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-          <img src="${receta.imagen || 'assets/images/default.jpg'}" alt="" class="templatemo-item">
-          <h4>${receta.nombre}</h4>
-          <h6>${receta.ingredientes.slice(0, 2).join(', ')}</h6>
-          <span><i class="fa fa-cutlery" style="color: yellow;"></i> ${receta.ingredientes.length} ingredientes</span>
+    data.forEach(receta => {
+      const col = document.createElement('div');
+      col.className = 'col-lg-4 col-md-6 mb-4';
+
+      col.innerHTML = `
+        <div class="item" style="background-color: #1f2122; padding: 15px; border-radius: 15px;">
+          <img src="${receta.imagen || 'assets/images/default.jpg'}" alt="" class="templatemo-item" style="border-radius: 10px; width: 100%; height: auto;">
+          <h4 class="mt-3">${receta.nombre}</h4>
+          <h6>${receta.ingredientes.slice(0, 3).join(', ')}${receta.ingredientes.length > 3 ? '...' : ''}</h6>
+          <span><i class="fa fa-cutlery" style="color: yellow;"></i> ${receta.ingredientes.length} ingredientes</span><br>
           <span><i class="fa fa-list" style="color: #ec6090;"></i> ${receta.preparacion.length} pasos</span>
-          <div class="download">
-            <a href="details.html?id=${encodeURIComponent(receta.nombre)}"><i class="fa fa-eye"></i></a>
+          <div class="download mt-2">
+            <a href="details.html?id=${encodeURIComponent(receta.nombre)}" class="btn btn-sm btn-outline-light mt-2"><i class="fa fa-eye"></i> Ver</a>
           </div>
-        `;
-        listContainer.appendChild(li);
-      });
-    })
-    .catch(err => {
-      console.error("Error cargando recetas", err);
-      document.getElementById('receta-list').innerHTML = "<li>Error cargando recetas.</li>";
+        </div>
+      `;
+      listContainer.appendChild(col);
     });
+  })
+  .catch(err => {
+    console.error("Error cargando recetas", err);
+    document.getElementById('receta-list').innerHTML = "<p>Error cargando recetas.</p>";
+  });
+
 </script>
 
 
