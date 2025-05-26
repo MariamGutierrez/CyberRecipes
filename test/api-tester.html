@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CyberRecipes API Tester</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 800px;
+      margin: 2rem auto;
+    }
+    button, input {
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 1rem;
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>CyberRecipes API Tester</h1>
+
+  <section>
+    <h2>POST /recetas/procesar_links/</h2>
+    <button onclick="procesarLinks()">Procesar Links</button>
+  </section>
+
+  <section>
+    <h2>GET /recetas</h2>
+    <button onclick="obtenerRecetas()">Obtener Todas las Recetas</button>
+  </section>
+
+  <section>
+    <h2>GET /receta/{nombre}</h2>
+    <input type="text" id="nombreReceta" placeholder="Nombre exacto de la receta" />
+    <button onclick="buscarReceta()">Buscar Receta</button>
+  </section>
+
+  <section>
+    <h2>Respuesta</h2>
+    <textarea id="output" readonly></textarea>
+  </section>
+
+  <script>
+    const baseURL = "https://recetas-791ea0b5224e.herokuapp.com/"; // Cambia si tu API está en otro lugar
+
+    function mostrarResultado(data) {
+      document.getElementById("output").value = JSON.stringify(data, null, 2);
+    }
+
+    async function procesarLinks() {
+      const res = await fetch(`${baseURL}/recetas/procesar_links/`, {
+        method: "POST"
+      });
+      const data = await res.json();
+      mostrarResultado(data);
+    }
+
+    async function obtenerRecetas() {
+      const res = await fetch(`${baseURL}/recetas`);
+      const data = await res.json();
+      mostrarResultado(data);
+    }
+
+    async function buscarReceta() {
+      const nombre = document.getElementById("nombreReceta").value.trim();
+      if (!nombre) {
+        alert("Por favor, ingresa el nombre de la receta.");
+        return;
+      }
+      const res = await fetch(`${baseURL}/receta/${encodeURIComponent(nombre)}`);
+      const data = await res.json();
+      mostrarResultado(data);
+    }
+  </script>
+</body>
+</html>

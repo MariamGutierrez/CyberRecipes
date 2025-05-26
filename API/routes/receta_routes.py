@@ -13,9 +13,11 @@ router = APIRouter()
 @router.post("/recetas/procesar_links/")
 def endpoint_procesar_links():
     try:
+        print("🔥 Ejecutando scraper en Heroku...")
         procesar_links_y_guardar()
         return {"mensaje": "Se procesaron y guardaron las recetas de todos los links"}
     except Exception as e:
+        print("❌ Error al procesar links:", str(e))
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/recetas", response_model=list[RecetaBase])
