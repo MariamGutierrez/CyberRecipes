@@ -2,6 +2,8 @@ from fastapi import APIRouter, HTTPException
 from API.schemas.receta_schemas import RecetaBase
 from API.services.receta_service import obtener_receta_desde_url, guardar_receta, scrapear_lista_y_guardar, procesar_links_y_guardar
 from API.db.mongo import recetas_collection
+from fastapi import HTTPException
+from bson.objectid import ObjectId
 
 router = APIRouter()
 
@@ -20,3 +22,10 @@ def endpoint_procesar_links():
 def obtener_recetas():
     recetas = list(recetas_collection.find({}, {"_id": 0}))  # Excluir _id para evitar error de serialización
     return recetas
+
+@router.get("/receta/{nombre}")
+def obtener_receta_por_nombre(nombre: str):
+    receta = recetas_collection.find_one({"nombre": nombre}, {"_id": 0})
+    if not receta:
+        raise HTTPException(status_code=404, detail="Receta no encontrada")
+    return receta

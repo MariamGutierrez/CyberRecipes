@@ -262,6 +262,30 @@ https://templatemo.com/tm-579-cyborg-gaming
   <script src="assets/js/tabs.js"></script>
   <script src="assets/js/popup.js"></script>
   <script src="assets/js/custom.js"></script>
+<script>
+  function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+
+  const recetaId = getQueryParam("id");
+  if (recetaId) {
+    fetch(`http://localhost:8000/receta/${encodeURIComponent(recetaId)}`)
+      .then(res => res.json())
+      .then(receta => {
+        document.querySelector("h2").textContent = receta.nombre;
+        document.querySelector(".left-info .left h4").textContent = receta.nombre;
+        document.querySelector(".left-info .left span").textContent = receta.ingredientes.join(', ');
+        document.querySelector(".content p").innerHTML = receta.preparacion.join('<br><br>');
+        document.querySelector(".thumb img").src = receta.imagen || 'assets/images/default.jpg';
+      })
+      .catch(err => {
+        console.error("Error cargando detalles", err);
+      });
+  } else {
+    document.querySelector("h2").textContent = "Receta no especificada";
+  }
+</script>
 
 
   </body>

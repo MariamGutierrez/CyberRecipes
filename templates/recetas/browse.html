@@ -413,5 +413,22 @@ https://templatemo.com/tm-579-cyborg-gaming
 
 
   </body>
+  <script>
+  fetch('http://localhost:8000/recetas')
+    .then(res => res.json())
+    .then(data => {
+      const listContainer = document.createElement('ul');
+      data.forEach(receta => {
+        const li = document.createElement('li');
+        li.innerHTML = `<a href="details.html?id=${encodeURIComponent(receta.nombre)}">${receta.nombre}</a>`;
+        listContainer.appendChild(li);
+      });
+      document.body.appendChild(listContainer); // o reemplaza por tu contenedor específico
+    })
+    .catch(err => {
+      console.error("Error cargando recetas", err);
+    });
+</script>
+
 
 </html>

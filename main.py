@@ -5,6 +5,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
+
+
 app = FastAPI()
 
 app.add_middleware(
@@ -20,7 +22,7 @@ app.mount("/vendor", StaticFiles(directory="static/vendor"), name="vendor")
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
-    return templates.TemplateResponse("recetas/details.html", {"request": request})
+    return templates.TemplateResponse("recetas/browse.html", {"request": request})
 
 app.include_router(receta_routes.router)
 
