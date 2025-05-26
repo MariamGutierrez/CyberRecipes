@@ -136,7 +136,12 @@ https://templatemo.com/tm-579-cyborg-gaming
 
   </body>
 <script>
-  fetch('http://localhost:8000/recetas')
+
+  const API_BASE = window.location.hostname.includes('localhost')
+    ? 'http://localhost:8000'
+    : 'https://recetas-791ea0b5224e.herokuapp.com';
+
+  fetch(`${API_BASE}/recetas`)
     .then(res => res.json())
     .then(data => {
       const listContainer = document.getElementById('receta-list');
