@@ -89,22 +89,39 @@ def procesar_links_y_guardar():
     obtener_receta_desde_url, y la guarda en recetas_collection.
     Omite duplicados si ya existe una receta con esa misma URL.
     """
-    for doc in links_collection.find({}, {"url": 1, "_id": 0}):
+
+    links = list(links_collection.find({}, {"url": 1, "_id": 0}))
+    print(f"🔍 Encontrados {len(links)} links en la colección 'links-recetas'.")
+
+    guardadas = 0
+    duplicadas = 0
+    fallidas = 0
+
+    for doc in links:
         url = doc["url"]
-        
+
         # Omitir si ya la tenemos
         if recetas_collection.count_documents({"url": url}, limit=1):
+            print(f"⏭️ Ya existe receta con URL: {url}")
+            duplicadas += 1
             continue
-        
+
         receta = obtener_receta_desde_url(url)
         if receta:
-            # Añadimos la URL al dict antes de insertar
             data = receta.model_dump(mode="json")
             data["url"] = url
             result = recetas_collection.insert_one(data)
-            print(f"Guardada receta '{receta.nombre}' (_id={result.inserted_id})")
+            guardadas += 1
+            print(f"✅ Guardada receta '{receta.nombre}' (_id={result.inserted_id})")
         else:
-            print(f"No se pudo scrapear {url}")
+            print(f"❌ No se pudo scrapear: {url}")
+            fallidas += 1
+
+    print("📊 RESUMEN:")
+    print(f"✔️ Recetas guardadas: {guardadas}")
+    print(f"🔁 Recetas duplicadas: {duplicadas}")
+    print(f"❌ Fallos de scrapeo: {fallidas}")
+
 
 def guardar_link_de_receta(url: str):
     links_collection.insert_one({"url": url})
