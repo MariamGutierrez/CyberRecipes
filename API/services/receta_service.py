@@ -90,37 +90,43 @@ def procesar_links_y_guardar():
     Omite duplicados si ya existe una receta con esa misma URL.
     """
 
-    links = list(links_collection.find({}, {"url": 1, "_id": 0}))
-    print(f"🔍 Encontrados {len(links)} links en la colección 'links-recetas'.")
+    try:
+        links = list(links_collection.find({}, {"url": 1, "_id": 0}))
+    except Exception as e:
+        raise Exception(f"No se pudo acceder a la colección de links: {str(e)}")
 
-    guardadas = 0
-    duplicadas = 0
-    fallidas = 0
+    resumen = {
+        "total_links": len(links),
+        "guardadas": 0,
+        "duplicadas": 0,
+        "fallidas": 0,
+        "errores": []
+    }
 
     for doc in links:
         url = doc["url"]
 
-        # Omitir si ya la tenemos
-        if recetas_collection.count_documents({"url": url}, limit=1):
-            print(f"⏭️ Ya existe receta con URL: {url}")
-            duplicadas += 1
-            continue
+        try:
+            # Omitir si ya existe
+            if recetas_collection.count_documents({"url": url}, limit=1):
+                resumen["duplicadas"] += 1
+                continue
 
-        receta = obtener_receta_desde_url(url)
-        if receta:
-            data = receta.model_dump(mode="json")
-            data["url"] = url
-            result = recetas_collection.insert_one(data)
-            guardadas += 1
-            print(f"✅ Guardada receta '{receta.nombre}' (_id={result.inserted_id})")
-        else:
-            print(f"❌ No se pudo scrapear: {url}")
-            fallidas += 1
+            receta = obtener_receta_desde_url(url)
+            if receta:
+                data = receta.model_dump(mode="json")
+                data["url"] = url
+                recetas_collection.insert_one(data)
+                resumen["guardadas"] += 1
+            else:
+                resumen["fallidas"] += 1
+                resumen["errores"].append(f"No se pudo scrapear {url}")
+        except Exception as e:
+            resumen["fallidas"] += 1
+            resumen["errores"].append(f"Error con {url}: {str(e)}")
 
-    print("📊 RESUMEN:")
-    print(f"✔️ Recetas guardadas: {guardadas}")
-    print(f"🔁 Recetas duplicadas: {duplicadas}")
-    print(f"❌ Fallos de scrapeo: {fallidas}")
+    return resumen
+
 
 
 def guardar_link_de_receta(url: str):
