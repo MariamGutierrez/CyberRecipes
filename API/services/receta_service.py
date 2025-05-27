@@ -1,7 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
-from API.db.mongo import recetas_collection
 from API.schemas.receta_schemas import RecetaBase
 from API.db.mongo import recetas_collection, links_collection
 
@@ -81,7 +80,9 @@ def scrapear_lista_y_guardar():
         # 2) scrappeo y guardo la receta
         receta = obtener_receta_desde_url(url)
         if receta:
-            receta.model_dump(mode="json")
+            data = receta.model_dump(mode="json")
+            data["url"] = url  # Asegúrate de incluir el URL si es importante
+            recetas_collection.insert_one(data)
 
 def procesar_links_y_guardar():
     """
